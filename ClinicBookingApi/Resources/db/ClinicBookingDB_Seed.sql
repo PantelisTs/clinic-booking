@@ -42,7 +42,7 @@ BEGIN TRY
 	-- ============================================
 	-- ADMIN: all capabilities
 	-- ============================================
-	INSERT INTO [dbo].[RolesCapabilities] ([RoleId], [CapabilityId])
+	INSERT INTO [dbo].[RolesCapabilities] ([RolesId], [CapabilitiesId])
 	SELECT r.[Id], c.[Id]
 	FROM [dbo].[Roles] r
 	CROSS JOIN [dbo].[Capabilities] c
@@ -53,7 +53,7 @@ BEGIN TRY
 	-- DOCTOR: VIEW_ONLY_DOCTOR, VIEW_APPOINTMENT,
 	--         EDIT_APPOINTMENT
 	-- ============================================
-	INSERT INTO [dbo].[RolesCapabilities] ([RoleId], [CapabilityId])
+	INSERT INTO [dbo].[RolesCapabilities] ([RolesId], [CapabilitiesId])
 	SELECT r.[Id], c.[Id]
 	FROM [dbo].[Roles] r
 	CROSS JOIN [dbo].[Capabilities] c
@@ -66,7 +66,7 @@ BEGIN TRY
 	--          VIEW_DOCTOR, INSERT_APPOINTMENT,
 	--          VIEW_APPOINTMENT, CANCEL_APPOINTMENT
 	-- ============================================
-	INSERT INTO [dbo].[RolesCapabilities] ([RoleId], [CapabilityId])
+	INSERT INTO [dbo].[RolesCapabilities] ([RolesId], [CapabilitiesId])
 	SELECT r.[Id], c.[Id]
 	FROM [dbo].[Roles] r
 	CROSS JOIN [dbo].[Capabilities] c
