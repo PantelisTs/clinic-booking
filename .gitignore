@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+
+.vs/
+
+# Build output
+**/bin/
+**/obj/
+
+ClinicBookingApi/appsettings.Development.json
+ClinicBookingApi/ClinicBookingApi.csproj.user
