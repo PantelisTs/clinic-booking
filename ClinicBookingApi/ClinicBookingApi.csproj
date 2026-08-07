@@ -25,8 +25,12 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Configuration\" />
+    <Folder Include="Core\" />
+    <Folder Include="DTO\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Security\" />
     <Folder Include="Services\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>
