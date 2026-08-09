@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Configuration\" />
-    <Folder Include="Core\" />
     <Folder Include="DTO\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Security\" />

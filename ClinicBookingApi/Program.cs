@@ -1,5 +1,6 @@
 
 using ClinicBookingApi.Data;
+using ClinicBookingApi.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicBookingApi
@@ -14,6 +15,8 @@ namespace ClinicBookingApi
 
 			builder.Services.AddDbContext<ClinicBookingDbContext>(options =>
 				options.UseSqlServer(connString));
+
+			builder.Services.AddRepositories();
 
 			// Add services to the container.
 
