@@ -18,6 +18,8 @@ namespace ClinicBookingApi
 
 			builder.Services.AddRepositories();
 
+			builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
+
 			// Add services to the container.
 
 			builder.Services.AddControllers();
