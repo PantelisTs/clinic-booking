@@ -7,5 +7,10 @@
     },
     "ConnectionStrings": {
         "DevConnection": "Server=localhost,PORT;Database=DBNAME;User Id=USERNAME;Password=PASSWORD;TrustServerCertificate=True;MultipleActiveResultSets=true"
+    },
+    "Jwt": {
+        "Issuer": "https://localhost:8081",
+        "Audience": "https://localhost:8081",
+        "Secret": "hWrCymnBw/n3eok46024snYzikxMgnpqgWZ7OJCRwiI="
     }
 }
