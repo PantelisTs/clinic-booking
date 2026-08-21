@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Serilog;
 
 namespace ClinicBookingApi
 {
@@ -19,6 +20,11 @@ namespace ClinicBookingApi
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+
+			builder.Host.UseSerilog((hostingContext, configuration) =>
+			{
+				configuration.ReadFrom.Configuration(hostingContext.Configuration);
+			});
 
 			var connString = builder.Configuration.GetConnectionString("DevConnection");
 			builder.Services.AddDbContext<ClinicBookingDbContext>(options =>
