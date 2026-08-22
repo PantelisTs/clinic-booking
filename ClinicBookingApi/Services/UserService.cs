@@ -109,12 +109,17 @@ namespace ClinicBookingApi.Services
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
 			var claimsInfo = new List<Claim>
+	{
+		new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+		new Claim(ClaimTypes.Name, user.Username),
+		new Claim(ClaimTypes.Email, user.Email),
+		new Claim(ClaimTypes.Role, user.Role.Name)
+	};
+
+			foreach (var capability in user.Role.Capabilities)
 			{
-				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-				new Claim(ClaimTypes.Name, user.Username),
-				new Claim(ClaimTypes.Email, user.Email),
-				new Claim(ClaimTypes.Role, user.Role.Name)
-			};
+				claimsInfo.Add(new Claim("capability", capability.Name));
+			}
 
 			var jwtSecurityToken = new JwtSecurityToken(
 				issuer: _configuration["Jwt:Issuer"],

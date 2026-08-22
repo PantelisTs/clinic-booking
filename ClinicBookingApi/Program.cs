@@ -102,6 +102,11 @@ namespace ClinicBookingApi
 			builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 			builder.Services.AddProblemDetails();
 
+			builder.Services.AddAuthorization(options =>
+			{
+				options.AddPolicy("VIEW_USERS", p => p.RequireClaim("capability", "VIEW_USERS"));
+			});
+
 			var app = builder.Build();
 
 			app.UseExceptionHandler();
