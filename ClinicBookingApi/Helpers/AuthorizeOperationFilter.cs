@@ -26,7 +26,7 @@ namespace ClinicBookingApi.Helpers
 
 				operation.Security.Add(new OpenApiSecurityRequirement
 				{
-					[new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme, null)] = roles.ToList()
+					[new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme, context.Document)] = roles.ToList()
 				});
 			}
 		}
