@@ -10,5 +10,7 @@ namespace ClinicBookingApi.Repositories
 		Task<User?> GetUserDoctorByUsernameAsync(string username);
 		Task<PaginatedResult<User>> GetPaginatedDoctorsAsync(int pageNumber, int pageSize,
 			List<Expression<Func<User, bool>>> predicates);
+		Task<Doctor?> GetByIdWithUserAsync(int id);
+		Task<PaginatedResult<Doctor>> GetPaginatedDoctorsWithUserAsync(int pageNumber, int pageSize);
 	}
 }

@@ -66,5 +66,33 @@ namespace ClinicBookingApi.Repositories
 
 			return appointments;
 		}
+
+		public async Task<Doctor?> GetByIdWithUserAsync(int id)
+		{
+			return await _context.Doctors
+				.Include(d => d.User)
+				.FirstOrDefaultAsync(d => d.Id == id);
+		}
+
+		public async Task<PaginatedResult<Doctor>> GetPaginatedDoctorsWithUserAsync(int pageNumber, int pageSize)
+		{
+			int totalRecords = await _context.Doctors.CountAsync();
+			int skip = (pageNumber - 1) * pageSize;
+
+			var data = await _context.Doctors
+				.Include(d => d.User)
+				.OrderBy(d => d.Id)
+				.Skip(skip)
+				.Take(pageSize)
+				.ToListAsync();
+
+			return new PaginatedResult<Doctor>()
+			{
+				Data = data,
+				TotalRecords = totalRecords,
+				PageNumber = pageNumber,
+				PageSize = pageSize
+			};
+		}
 	}
 }
