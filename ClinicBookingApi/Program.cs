@@ -106,6 +106,8 @@ namespace ClinicBookingApi
 			{
 				options.AddPolicy("VIEW_USERS", p => p.RequireClaim("capability", "VIEW_USERS"));
 				options.AddPolicy("VIEW_DOCTORS", p => p.RequireClaim("capability", "VIEW_DOCTORS"));
+				options.AddPolicy("VIEW_PATIENTS", p => p.RequireClaim("capability", "VIEW_PATIENTS"));
+				options.AddPolicy("VIEW_PATIENT", p => p.RequireClaim("capability", "VIEW_PATIENT"));
 			});
 
 			var app = builder.Build();
