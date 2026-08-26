@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ClinicBookingApi.Core;
 using ClinicBookingApi.DTO;
 using ClinicBookingApi.Exceptions;
 using ClinicBookingApi.Models;
@@ -42,6 +43,34 @@ namespace ClinicBookingApi.Services
 			await _unitOfWork.SaveAsync();
 			_logger.LogInformation("Doctor {Username} signed up successfully.", user.Username);
 			return _mapper.Map<UserReadOnlyDTO>(user);
+		}
+
+		public async Task<DoctorReadOnlyDTO> GetDoctorByIdAsync(int id)
+		{
+			var doctor = await _unitOfWork.DoctorRepository.GetByIdWithUserAsync(id);
+			if (doctor == null)
+			{
+				throw new EntityNotFoundException("Doctor", $"Doctor with id {id} not found");
+			}
+
+			_logger.LogInformation("Doctor with id {Id} found", id);
+			return _mapper.Map<DoctorReadOnlyDTO>(doctor);
+		}
+
+		public async Task<PaginatedResult<DoctorReadOnlyDTO>> GetPaginatedDoctorsAsync(int pageNumber, int pageSize)
+		{
+			var result = await _unitOfWork.DoctorRepository.GetPaginatedDoctorsWithUserAsync(pageNumber, pageSize);
+
+			var dtoResult = new PaginatedResult<DoctorReadOnlyDTO>()
+			{
+				Data = _mapper.Map<List<DoctorReadOnlyDTO>>(result.Data),
+				TotalRecords = result.TotalRecords,
+				PageNumber = result.PageNumber,
+				PageSize = result.PageSize
+			};
+
+			_logger.LogInformation("Retrieved {Count} doctors", dtoResult.Data.Count);
+			return dtoResult;
 		}
 	}
 }
