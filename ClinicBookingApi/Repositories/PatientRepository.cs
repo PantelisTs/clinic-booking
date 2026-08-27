@@ -105,5 +105,11 @@ namespace ClinicBookingApi.Repositories
 				PageSize = pageSize
 			};
 		}
+
+		public async Task<Patient?> GetByUserIdAsync(int userId)
+		{
+			return await _context.Patients
+				.FirstOrDefaultAsync(p => p.UserId == userId);
+		}
 	}
 }

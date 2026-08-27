@@ -30,6 +30,11 @@ namespace ClinicBookingApi.Configuration
 				.ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
 				.ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
 				.ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+
+			CreateMap<Appointment, AppointmentReadOnlyDTO>()
+				.ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+				.ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient.User.FirstName + " " + src.Patient.User.LastName))
+				.ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.Doctor.User.FirstName + " " + src.Doctor.User.LastName));
 		}
 	}
 }
