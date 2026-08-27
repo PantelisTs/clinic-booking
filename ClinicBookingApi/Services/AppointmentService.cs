@@ -60,10 +60,19 @@ namespace ClinicBookingApi.Services
 			return _mapper.Map<AppointmentReadOnlyDTO>(created);
 		}
 
-		public async Task<AppointmentReadOnlyDTO> GetAppointmentByIdAsync(int id)
+		public async Task<AppointmentReadOnlyDTO> GetAppointmentByIdAsync(int id, int currentUserId, string currentUserRole)
 		{
 			var appointment = await _unitOfWork.AppointmentRepository.GetByIdWithDetailsAsync(id)
 				?? throw new EntityNotFoundException("Appointment", $"Appointment with id {id} not found");
+
+			var hasGeneralAccess = currentUserRole == "ADMIN";
+			var isOwnPatientAppointment = currentUserRole == "PATIENT" && appointment.Patient.UserId == currentUserId;
+			var isOwnDoctorAppointment = currentUserRole == "DOCTOR" && appointment.Doctor.UserId == currentUserId;
+
+			if (!hasGeneralAccess && !isOwnPatientAppointment && !isOwnDoctorAppointment)
+			{
+				throw new EntityForbiddenException("Appointment", "You do not have permission to view this appointment.");
+			}
 
 			return _mapper.Map<AppointmentReadOnlyDTO>(appointment);
 		}

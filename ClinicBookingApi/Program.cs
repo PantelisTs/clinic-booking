@@ -35,6 +35,7 @@ namespace ClinicBookingApi
 			builder.Services.AddScoped<IPatientService, PatientService>();
 			builder.Services.AddScoped<IApplicationService, ApplicationService>();
 			builder.Services.AddSingleton<IEncryptionUtil, EncryptionUtil>();
+			builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 			builder.Services.AddRepositories();
 
@@ -108,6 +109,11 @@ namespace ClinicBookingApi
 				options.AddPolicy("VIEW_DOCTORS", p => p.RequireClaim("capability", "VIEW_DOCTORS"));
 				options.AddPolicy("VIEW_PATIENTS", p => p.RequireClaim("capability", "VIEW_PATIENTS"));
 				options.AddPolicy("VIEW_PATIENT", p => p.RequireClaim("capability", "VIEW_PATIENT"));
+				options.AddPolicy("INSERT_APPOINTMENT", p => p.RequireClaim("capability", "INSERT_APPOINTMENT"));
+				options.AddPolicy("VIEW_APPOINTMENT", p => p.RequireClaim("capability", "VIEW_APPOINTMENT"));
+				options.AddPolicy("VIEW_APPOINTMENTS", p => p.RequireClaim("capability", "VIEW_APPOINTMENTS"));
+				options.AddPolicy("EDIT_APPOINTMENT", p => p.RequireClaim("capability", "EDIT_APPOINTMENT"));
+				options.AddPolicy("CANCEL_APPOINTMENT", p => p.RequireClaim("capability", "CANCEL_APPOINTMENT"));
 			});
 
 			var app = builder.Build();
