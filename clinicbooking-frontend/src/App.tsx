@@ -1,15 +1,11 @@
-import './App.css'
+import { Button } from "@/components/ui/button"
 
 function App() {
-
-
-  return (
-    <>
-      <h1 className="text-3xl font-bold text-blue-600 text-center mt-10">
-          Clinic Booking
-      </h1>
-    </>
-  )
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <Button>Clinic Booking</Button>
+        </div>
+    )
 }
 
 export default App
