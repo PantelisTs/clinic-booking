@@ -109,12 +109,16 @@ namespace ClinicBookingApi.Services
 			var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
 			var claimsInfo = new List<Claim>
-	{
-		new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-		new Claim(ClaimTypes.Name, user.Username),
-		new Claim(ClaimTypes.Email, user.Email),
-		new Claim(ClaimTypes.Role, user.Role.Name)
-	};
+		{
+			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+			new Claim(ClaimTypes.Name, user.Username),
+			new Claim(ClaimTypes.Email, user.Email),
+			new Claim(ClaimTypes.Role, user.Role.Name),
+			new Claim("id", user.Id.ToString()),
+			new Claim("username", user.Username),
+			new Claim("email", user.Email),
+			new Claim("role", user.Role.Name)
+		};
 
 			foreach (var capability in user.Role.Capabilities)
 			{
