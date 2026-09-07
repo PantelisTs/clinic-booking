@@ -4,6 +4,8 @@
 
 .vs/
 
+.idea/
+
 # Build output
 **/bin/
 **/obj/
