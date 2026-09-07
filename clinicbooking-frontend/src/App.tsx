@@ -1,10 +1,17 @@
-import { Button } from "@/components/ui/button"
+import { Route, Routes } from "react-router"
+import LoginPage from "@/pages/LoginPage.tsx"
+import Dashboard from "@/pages/Dashboard.tsx"
+import ProtectedRoute from "@/components/auth/ProtectedRoute.tsx"
 
 function App() {
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <Button>Clinic Booking</Button>
-        </div>
+        <Routes>
+            <Route path="login" element={<LoginPage />} />
+
+            <Route element={<ProtectedRoute />}>
+                <Route path="dashboard" element={<Dashboard />} />
+            </Route>
+        </Routes>
     )
 }
 

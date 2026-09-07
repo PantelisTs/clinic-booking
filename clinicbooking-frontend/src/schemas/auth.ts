@@ -1,8 +1,8 @@
 import { z } from "zod"
 
 export const loginSchema = z.object({
-    username: z.string().min(1, { error: "Το username είναι υποχρεωτικό" }),
-    password: z.string().min(1, { error: "Το password είναι υποχρεωτικό" }),
+    username: z.string().min(1, { error: "Username is required" }),
+    password: z.string().min(1, { error: "Password is required" }),
     keepLoggedIn: z.boolean(),
 })
 
