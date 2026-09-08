@@ -1,22 +1,23 @@
-import { Button } from "@/components/ui/button.tsx"
 import { useAuth } from "@/context/AuthProvider.tsx"
-import { useNavigate } from "react-router"
+import AdminDashboard from "@/pages/AdminDashboard.tsx"
+import DoctorDashboard from "@/pages/DoctorDashboard.tsx"
+import PatientDashboard from "@/pages/PatientDashboard.tsx"
+
+function renderDashboardByRole(role: string | null) {
+    switch (role) {
+        case "ADMIN":
+            return <AdminDashboard />
+        case "DOCTOR":
+            return <DoctorDashboard />
+        case "PATIENT":
+            return <PatientDashboard />
+        default:
+            return <p className="text-destructive">Unknown role: {role}</p>
+    }
+}
 
 export default function Dashboard() {
-    const { username, role, logoutUser } = useAuth()
-    const navigate = useNavigate()
+    const { role } = useAuth()
 
-    const handleLogout = () => {
-        logoutUser()
-        navigate("/login")
-    }
-
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-            <p>
-                Καλωσήρθες, {username} ({role})
-            </p>
-            <Button onClick={handleLogout}>Logout</Button>
-        </div>
-    )
+    return <div className="p-8">{renderDashboardByRole(role)}</div>
 }
