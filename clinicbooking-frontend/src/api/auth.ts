@@ -1,4 +1,10 @@
-import type { LoginFields, LoginResponse } from "@/schemas/auth.ts"
+import type {
+    LoginFields,
+    LoginResponse,
+    DoctorSignupFields,
+    PatientSignupFields,
+    SignupResponse,
+} from "@/schemas/auth.ts"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -19,26 +25,38 @@ function extractErrorMessage(data: unknown): string {
             }
         }
     }
-    return "Login failed"
+    return "Request failed"
 }
 
-export async function login(fields: LoginFields): Promise<LoginResponse> {
-    const res = await fetch(API_URL + "/auth/login", {
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+    const res = await fetch(API_URL + path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fields),
+        body: JSON.stringify(body),
     })
 
     if (!res.ok) {
-        let message = "Login failed"
+        let message = "Request failed"
         try {
             const data = await res.json()
             message = extractErrorMessage(data)
         } catch (error) {
-            console.error("Error parsing login response", error)
+            console.error("Error parsing error response", error)
         }
         throw new Error(message)
     }
 
     return await res.json()
+}
+
+export function login(fields: LoginFields) {
+    return postJson<LoginResponse>("/auth/login", fields)
+}
+
+export function registerDoctor(fields: DoctorSignupFields) {
+    return postJson<SignupResponse>("/auth/register/doctor", { ...fields, roleId: 2 })
+}
+
+export function registerPatient(fields: PatientSignupFields) {
+    return postJson<SignupResponse>("/auth/register/patient", { ...fields, roleId: 3 })
 }
