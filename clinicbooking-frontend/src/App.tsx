@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router"
+import {Navigate, Route, Routes} from "react-router"
 import LoginPage from "@/pages/LoginPage.tsx"
 import Dashboard from "@/pages/Dashboard.tsx"
 import ProtectedRoute from "@/components/auth/ProtectedRoute.tsx"
@@ -9,6 +9,7 @@ function App() {
     return (
         <Routes>
             <Route element={<RouterLayout />}>
+                <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
 
