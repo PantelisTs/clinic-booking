@@ -30,3 +30,11 @@ export function updateAppointment(
 ) {
     return request<Appointment>("PUT", `/appointments/${id}`, { token, body: changes })
 }
+
+export function getAllAppointments(token: string, pageNumber = 1, pageSize = 10) {
+    return request<PaginatedResult<Appointment>>(
+        "GET",
+        `/appointments?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+        { token }
+    )
+}
