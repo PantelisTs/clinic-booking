@@ -1,11 +1,13 @@
 import type {Appointment, AppointmentStatus} from "@/schemas/appointment.ts"
 import {Card, CardContent} from "@/components/ui/card.tsx"
 import {Button} from "@/components/ui/button.tsx"
+import { useState } from "react"
 
 type AppointmentCardProps = {
     appointment: Appointment
     onCancel?: (appointment: Appointment) => void
     onStatusChange?: (appointment: Appointment, status: AppointmentStatus) => void
+    onNotesSave?: (appointment: Appointment, notes: string) => Promise<boolean>
 }
 
 const statusStyles: Record<AppointmentStatus, string> = {
@@ -37,7 +39,7 @@ function getStatusActions(status: AppointmentStatus): StatusAction[] {
     }
 }
 
-export default function AppointmentCard({appointment, onCancel, onStatusChange}: AppointmentCardProps) {
+export default function AppointmentCard({appointment, onCancel, onStatusChange, onNotesSave}: AppointmentCardProps) {
     const formattedDate = new Date(appointment.scheduledAt).toLocaleString("en-GB", {
         dateStyle: "medium",
         timeStyle: "short",
@@ -47,47 +49,98 @@ export default function AppointmentCard({appointment, onCancel, onStatusChange}:
         onCancel !== undefined &&
         (appointment.status === "Pending" || appointment.status === "Confirmed")
 
+    const [editingNotes, setEditingNotes] = useState(false)
+    const [draft, setDraft] = useState("")
+    const [saving, setSaving] = useState(false)
+
+    const startEditing = () => {
+        setDraft(appointment.notes ?? "")
+        setEditingNotes(true)
+    }
+
+    const saveNotes = async () => {
+        if (!onNotesSave) return
+        setSaving(true)
+        try {
+            const saved = await onNotesSave(appointment, draft.trim())
+            if (saved) setEditingNotes(false)
+        } finally {
+            setSaving(false)
+        }
+    }
+
     return (
         <Card>
-            <CardContent className="flex items-center justify-between gap-4">
-                <div>
-                    <p className="font-medium">{formattedDate}</p>
-                    <p className="text-sm text-muted-foreground">
-                        Doctor: {appointment.doctorName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                        Patient: {appointment.patientName}
-                    </p>
-                    {appointment.notes && (
-                        <p className="text-sm mt-1">Notes: {appointment.notes}</p>
-                    )}
+            <CardContent className="space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <p className="font-medium">{formattedDate}</p>
+                        <p className="text-sm text-muted-foreground">
+                            Doctor: {appointment.doctorName}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            Patient: {appointment.patientName}
+                        </p>
+                        {appointment.notes && (
+                            <p className="text-sm mt-1">Notes: {appointment.notes}</p>
+                        )}
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                        <span
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[appointment.status]}`}
+                        >
+                            {appointment.status}
+                        </span>
+                        {canCancel && (
+                            <Button variant="outline" size="sm" onClick={() => onCancel(appointment)}>
+                                Cancel
+                            </Button>
+                        )}
+                        {onStatusChange && (
+                            <div className="flex gap-2">
+                                {getStatusActions(appointment.status).map((action) => (
+                                    <Button
+                                        key={action.status}
+                                        variant={action.status === "Cancelled" ? "outline" : "default"}
+                                        size="sm"
+                                        onClick={() => onStatusChange(appointment, action.status)}
+                                    >
+                                        {action.label}
+                                    </Button>
+                                ))}
+                            </div>
+                        )}
+                        {onNotesSave && !editingNotes && (
+                            <Button variant="ghost" size="sm" onClick={startEditing}>
+                                {appointment.notes ? "Edit notes" : "Add notes"}
+                            </Button>
+                        )}
+                    </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
-                    <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[appointment.status]}`}
-                    >
-                        {appointment.status}
-                    </span>
-                    {canCancel && (
-                        <Button variant="outline" size="sm" onClick={() => onCancel(appointment)}>
-                            Cancel
-                        </Button>
-                    )}
-                    {onStatusChange && (
+
+                {editingNotes && (
+                    <div className="space-y-2">
+                        <textarea
+                            className="min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs"
+                            placeholder="Write notes for the patient..."
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                        />
                         <div className="flex gap-2">
-                            {getStatusActions(appointment.status).map((action) => (
-                                <Button
-                                    key={action.status}
-                                    variant={action.status === "Cancelled" ? "outline" : "default"}
-                                    size="sm"
-                                    onClick={() => onStatusChange(appointment, action.status)}
-                                >
-                                    {action.label}
-                                </Button>
-                            ))}
+                            <Button size="sm" onClick={saveNotes} disabled={saving || draft.trim() === ""}>
+                                {saving ? "Saving..." : "Save notes"}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingNotes(false)}
+                                disabled={saving}
+                            >
+                                Cancel
+                            </Button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </CardContent>
         </Card>
     )
