@@ -37,6 +37,21 @@ export default function DoctorDashboard() {
         }
     }
 
+    const handleNotesSave = async (appointment: Appointment, notes: string) => {
+        if (!token) return false
+
+        try {
+            const updated = await updateAppointment(token, appointment.id, { notes })
+            setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+            toast.success("Notes saved")
+            return true
+        } catch (error) {
+            if (error instanceof UnauthorizedError) logoutUser()
+            toast.error(error instanceof Error ? error.message : "Could not save notes")
+            return false
+        }
+    }
+
     return (
         <div>
             <h2 className="text-xl font-semibold mb-4">Your appointments</h2>
@@ -53,6 +68,7 @@ export default function DoctorDashboard() {
                         key={appointment.id}
                         appointment={appointment}
                         onStatusChange={handleStatusChange}
+                        onNotesSave={handleNotesSave}
                     />
                 ))}
             </div>
