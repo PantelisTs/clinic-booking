@@ -1,3 +1,5 @@
+import { z } from "zod"
+
 export type AppointmentStatus = "Pending" | "Confirmed" | "Cancelled" | "Completed"
 
 export type Appointment = {
@@ -18,3 +20,15 @@ export type PaginatedResult<T> = {
     pageSize: number
     totalPages: number
 }
+
+export const bookAppointmentSchema = z.object({
+    doctorId: z.string().min(1, { error: "Please select a doctor" }),
+    scheduledAt: z
+        .string()
+        .min(1, { error: "Please select a date and time" })
+        .refine((value) => new Date(value) > new Date(), {
+            error: "Date and time must be in the future",
+        }),
+})
+
+export type BookAppointmentFields = z.infer<typeof bookAppointmentSchema>
