@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useAuth } from "@/context/AuthProvider.tsx"
-import { getMyAppointments } from "@/api/appointments.ts"
+import { cancelAppointment, getMyAppointments } from "@/api/appointments.ts"
 import { getDoctors } from "@/api/doctors.ts"
 import { UnauthorizedError } from "@/api/http.ts"
 import type { Appointment } from "@/schemas/appointment.ts"
@@ -36,6 +36,20 @@ export default function PatientDashboard() {
         )
     }
 
+    const handleCancel = async (appointment: Appointment) => {
+        if (!token) return
+        if (!window.confirm("Cancel this appointment?")) return
+
+        try {
+            const updated = await cancelAppointment(token, appointment.id)
+            setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+            toast.success("Appointment cancelled")
+        } catch (error) {
+            if (error instanceof UnauthorizedError) logoutUser()
+            toast.error(error instanceof Error ? error.message : "Cancel failed")
+        }
+    }
+
     return (
         <div>
             <h2 className="text-xl font-semibold mb-4">Your appointments</h2>
@@ -50,7 +64,7 @@ export default function PatientDashboard() {
 
             <div className="grid gap-4">
                 {appointments.map((appointment) => (
-                    <AppointmentCard key={appointment.id} appointment={appointment} />
+                    <AppointmentCard key={appointment.id} appointment={appointment} onCancel={handleCancel} />
                 ))}
             </div>
         </div>

@@ -1,8 +1,10 @@
-import type { Appointment, AppointmentStatus } from "@/schemas/appointment.ts"
-import { Card, CardContent } from "@/components/ui/card.tsx"
+import type {Appointment, AppointmentStatus} from "@/schemas/appointment.ts"
+import {Card, CardContent} from "@/components/ui/card.tsx"
+import {Button} from "@/components/ui/button.tsx"
 
 type AppointmentCardProps = {
     appointment: Appointment
+    onCancel?: (appointment: Appointment) => void
 }
 
 const statusStyles: Record<AppointmentStatus, string> = {
@@ -12,11 +14,15 @@ const statusStyles: Record<AppointmentStatus, string> = {
     Completed: "bg-gray-200 text-gray-800",
 }
 
-export default function AppointmentCard({ appointment }: AppointmentCardProps) {
+export default function AppointmentCard({appointment, onCancel}: AppointmentCardProps) {
     const formattedDate = new Date(appointment.scheduledAt).toLocaleString("en-GB", {
         dateStyle: "medium",
         timeStyle: "short",
     })
+
+    const canCancel =
+        onCancel !== undefined &&
+        (appointment.status === "Pending" || appointment.status === "Confirmed")
 
     return (
         <Card>
@@ -33,11 +39,18 @@ export default function AppointmentCard({ appointment }: AppointmentCardProps) {
                         <p className="text-sm mt-1">Notes: {appointment.notes}</p>
                     )}
                 </div>
-                <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[appointment.status]}`}
-                >
-                    {appointment.status}
-                </span>
+                <div className="flex flex-col items-end gap-2">
+                    <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[appointment.status]}`}
+                    >
+                        {appointment.status}
+                    </span>
+                    {canCancel && (
+                        <Button variant="outline" size="sm" onClick={() => onCancel(appointment)}>
+                            Cancel
+                        </Button>
+                    )}
+                </div>
             </CardContent>
         </Card>
     )
