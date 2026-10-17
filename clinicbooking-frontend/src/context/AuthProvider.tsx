@@ -16,6 +16,7 @@ type AuthContextProps = {
 type JwtPayload = {
     username: string
     role: string
+    exp: number
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -23,19 +24,22 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined)
 function readFromToken(token: string | null): JwtPayload | null {
     if (!token) return null
     try {
-        return jwtDecode<JwtPayload>(token)
+        const decoded = jwtDecode<JwtPayload>(token)
+        if (decoded.exp * 1000 <= Date.now()) return null
+        return decoded
     } catch {
         return null
     }
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const cookieToken = getCookie("access_token")
+    const cookieToken = getCookie("access_token") ?? null
+    const initialPayload = readFromToken(cookieToken)
 
-    const [token, setToken] = useState<string | null>(() => cookieToken ?? null)
-    const [payload, setPayload] = useState<JwtPayload | null>(() =>
-        readFromToken(cookieToken ?? null)
+    const [token, setToken] = useState<string | null>(() =>
+        initialPayload ? cookieToken : null
     )
+    const [payload, setPayload] = useState<JwtPayload | null>(() => initialPayload)
 
     const loginUser = async (fields: LoginFields) => {
         const res = await login(fields)
