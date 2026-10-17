@@ -81,6 +81,25 @@ namespace ClinicBookingApi.Controllers
 		}
 
 		/// <summary>
+		/// Gets a paginated list of the current user's own appointments (patient or doctor).
+		/// </summary>
+		[HttpGet("my")]
+		[Authorize(Policy = "VIEW_APPOINTMENT")]
+		[ProducesResponseType(typeof(PaginatedResult<AppointmentReadOnlyDTO>), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		public async Task<ActionResult<PaginatedResult<AppointmentReadOnlyDTO>>> GetMyAppointments(
+			[FromQuery] int pageNumber = 1,
+			[FromQuery] int pageSize = 10)
+		{
+			var currentUserId = GetCurrentUserId();
+			var result = await _applicationService.AppointmentService
+				.GetMyAppointmentsAsync(currentUserId, pageNumber, pageSize);
+
+			return Ok(result);
+		}
+
+		/// <summary>
 		/// Updates an appointment's notes and/or status (doctor only, own appointments).
 		/// </summary>
 		[HttpPut("{id:int}")]

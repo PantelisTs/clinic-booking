@@ -10,5 +10,6 @@ namespace ClinicBookingApi.Services
 		Task<PaginatedResult<AppointmentReadOnlyDTO>> GetPaginatedAppointmentsAsync(int pageNumber, int pageSize);
 		Task<AppointmentReadOnlyDTO> UpdateAppointmentAsync(int id, int currentUserId, string? notes, string? status);
 		Task<AppointmentReadOnlyDTO> CancelAppointmentAsync(int id, int currentUserId);
+		Task<PaginatedResult<AppointmentReadOnlyDTO>> GetMyAppointmentsAsync(int currentUserId, int pageNumber, int pageSize);
 	}
 }

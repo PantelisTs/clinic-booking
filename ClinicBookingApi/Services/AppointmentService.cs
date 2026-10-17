@@ -138,5 +138,22 @@ namespace ClinicBookingApi.Services
 			_logger.LogInformation("Appointment {Id} cancelled by patient user {UserId}", id, currentUserId);
 			return _mapper.Map<AppointmentReadOnlyDTO>(appointment);
 		}
+
+		public async Task<PaginatedResult<AppointmentReadOnlyDTO>> GetMyAppointmentsAsync(int currentUserId, int pageNumber, int pageSize)
+		{
+			var result = await _unitOfWork.AppointmentRepository
+				.GetPaginatedByUserWithDetailsAsync(currentUserId, pageNumber, pageSize);
+
+			var dtoResult = new PaginatedResult<AppointmentReadOnlyDTO>()
+			{
+				Data = _mapper.Map<List<AppointmentReadOnlyDTO>>(result.Data),
+				TotalRecords = result.TotalRecords,
+				PageNumber = result.PageNumber,
+				PageSize = result.PageSize
+			};
+
+			_logger.LogInformation("Retrieved {Count} appointments for user {UserId}", dtoResult.Data.Count, currentUserId);
+			return dtoResult;
+		}
 	}
 }

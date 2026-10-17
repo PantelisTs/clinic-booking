@@ -65,5 +65,30 @@ namespace ClinicBookingApi.Repositories
 				PageSize = pageSize
 			};
 		}
+
+		public async Task<PaginatedResult<Appointment>> GetPaginatedByUserWithDetailsAsync(int userId, int pageNumber, int pageSize)
+		{
+			var query = _context.Appointments
+				.Where(a => a.Patient.UserId == userId || a.Doctor.UserId == userId);
+
+			int totalRecords = await query.CountAsync();
+			int skip = (pageNumber - 1) * pageSize;
+
+			var data = await query
+				.Include(a => a.Patient).ThenInclude(p => p.User)
+				.Include(a => a.Doctor).ThenInclude(d => d.User)
+				.OrderByDescending(a => a.ScheduledAt)
+				.Skip(skip)
+				.Take(pageSize)
+				.ToListAsync();
+
+			return new PaginatedResult<Appointment>()
+			{
+				Data = data,
+				TotalRecords = totalRecords,
+				PageNumber = pageNumber,
+				PageSize = pageSize
+			};
+		}
 	}
 }
