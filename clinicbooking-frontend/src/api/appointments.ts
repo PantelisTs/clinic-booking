@@ -18,3 +18,7 @@ export function createAppointment(token: string, fields: BookAppointmentFields) 
         },
     })
 }
+
+export function cancelAppointment(token: string, id: number) {
+    return request<Appointment>("PATCH", `/appointments/${id}/cancel`, { token })
+}
