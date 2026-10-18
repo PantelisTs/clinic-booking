@@ -1,27 +1,25 @@
-import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button.tsx"
 import { useAuth } from "@/context/AuthProvider.tsx"
-import { getMyAppointments, updateAppointment } from "@/api/appointments.ts"
+import { useAppointments } from "@/hooks/useAppointments.ts"
+import { updateAppointment } from "@/api/appointments.ts"
 import { UnauthorizedError } from "@/api/http.ts"
 import type { Appointment, AppointmentStatus } from "@/schemas/appointment.ts"
 import AppointmentCard from "@/components/appointments/AppointmentCard.tsx"
+import Pagination from "@/components/common/Pagination.tsx"
 
 export default function DoctorDashboard() {
     const { token, logoutUser } = useAuth()
-    const [appointments, setAppointments] = useState<Appointment[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        if (!token) return
-
-        getMyAppointments(token)
-            .then((res) => setAppointments(res.data))
-            .catch((error: unknown) => {
-                if (error instanceof UnauthorizedError) logoutUser()
-                toast.error(error instanceof Error ? error.message : "Request failed")
-            })
-            .finally(() => setLoading(false))
-    }, [token, logoutUser])
+    const {
+        appointments,
+        pageNumber,
+        setPageNumber,
+        totalPages,
+        activeOnly,
+        toggleActiveOnly,
+        reload,
+        loading,
+    } = useAppointments("my")
 
     const handleStatusChange = async (appointment: Appointment, status: AppointmentStatus) => {
         if (!token) return
@@ -29,8 +27,8 @@ export default function DoctorDashboard() {
 
         try {
             const updated = await updateAppointment(token, appointment.id, { status })
-            setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
             toast.success(`Appointment ${updated.status.toLowerCase()}`)
+            reload()
         } catch (error) {
             if (error instanceof UnauthorizedError) logoutUser()
             toast.error(error instanceof Error ? error.message : "Update failed")
@@ -41,9 +39,9 @@ export default function DoctorDashboard() {
         if (!token) return false
 
         try {
-            const updated = await updateAppointment(token, appointment.id, { notes })
-            setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+            await updateAppointment(token, appointment.id, { notes })
             toast.success("Notes saved")
+            reload()
             return true
         } catch (error) {
             if (error instanceof UnauthorizedError) logoutUser()
@@ -54,12 +52,19 @@ export default function DoctorDashboard() {
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Your appointments</h2>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Your appointments</h2>
+                <Button variant="outline" size="sm" onClick={toggleActiveOnly}>
+                    {activeOnly ? "Show all" : "Show active only"}
+                </Button>
+            </div>
 
             {loading && <p className="text-muted-foreground">Loading...</p>}
 
             {!loading && appointments.length === 0 && (
-                <p className="text-muted-foreground">You have no appointments yet.</p>
+                <p className="text-muted-foreground">
+                    {activeOnly ? "You have no active appointments." : "You have no appointments yet."}
+                </p>
             )}
 
             <div className="grid gap-4">
@@ -72,6 +77,12 @@ export default function DoctorDashboard() {
                     />
                 ))}
             </div>
+
+            <Pagination
+                pageNumber={pageNumber}
+                totalPages={totalPages}
+                onPageChange={setPageNumber}
+            />
         </div>
     )
 }
