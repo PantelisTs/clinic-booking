@@ -9,7 +9,7 @@ namespace ClinicBookingApi.Repositories
 		Task<Doctor?> GetAppointmentDoctorAsync(int appointmentId);
 		Task<bool> HasConflictAsync(int doctorId, DateTime scheduledAt);
 		Task<Appointment?> GetByIdWithDetailsAsync(int id);
-		Task<PaginatedResult<Appointment>> GetPaginatedWithDetailsAsync(int pageNumber, int pageSize);
-		Task<PaginatedResult<Appointment>> GetPaginatedByUserWithDetailsAsync(int userId, int pageNumber, int pageSize);
+		Task<PaginatedResult<Appointment>> GetPaginatedWithDetailsAsync(int pageNumber, int pageSize, bool activeOnly);
+		Task<PaginatedResult<Appointment>> GetPaginatedByUserWithDetailsAsync(int userId, int pageNumber, int pageSize, bool activeOnly);
 	}
 }

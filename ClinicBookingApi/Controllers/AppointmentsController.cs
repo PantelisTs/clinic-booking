@@ -72,10 +72,11 @@ namespace ClinicBookingApi.Controllers
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		public async Task<ActionResult<PaginatedResult<AppointmentReadOnlyDTO>>> GetAppointments(
 			[FromQuery] int pageNumber = 1,
-			[FromQuery] int pageSize = 10)
+			[FromQuery] int pageSize = 10,
+			[FromQuery] bool activeOnly = false)
 		{
 			var result = await _applicationService.AppointmentService
-				.GetPaginatedAppointmentsAsync(pageNumber, pageSize);
+				.GetPaginatedAppointmentsAsync(pageNumber, pageSize, activeOnly);
 
 			return Ok(result);
 		}
@@ -90,11 +91,12 @@ namespace ClinicBookingApi.Controllers
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		public async Task<ActionResult<PaginatedResult<AppointmentReadOnlyDTO>>> GetMyAppointments(
 			[FromQuery] int pageNumber = 1,
-			[FromQuery] int pageSize = 10)
+			[FromQuery] int pageSize = 10,
+			[FromQuery] bool activeOnly = false)
 		{
 			var currentUserId = GetCurrentUserId();
 			var result = await _applicationService.AppointmentService
-				.GetMyAppointmentsAsync(currentUserId, pageNumber, pageSize);
+				.GetMyAppointmentsAsync(currentUserId, pageNumber, pageSize, activeOnly);
 
 			return Ok(result);
 		}

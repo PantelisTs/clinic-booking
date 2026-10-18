@@ -44,12 +44,15 @@ namespace ClinicBookingApi.Repositories
 				.FirstOrDefaultAsync(a => a.Id == id);
 		}
 
-		public async Task<PaginatedResult<Appointment>> GetPaginatedWithDetailsAsync(int pageNumber, int pageSize)
+		public async Task<PaginatedResult<Appointment>> GetPaginatedWithDetailsAsync(int pageNumber, int pageSize, bool activeOnly)
 		{
-			int totalRecords = await _context.Appointments.CountAsync();
+			var query = _context.Appointments.AsQueryable();
+			if (activeOnly) query = FilterActive(query);
+
+			int totalRecords = await query.CountAsync();
 			int skip = (pageNumber - 1) * pageSize;
 
-			var data = await _context.Appointments
+			var data = await query
 				.Include(a => a.Patient).ThenInclude(p => p.User)
 				.Include(a => a.Doctor).ThenInclude(d => d.User)
 				.OrderBy(a => a.Id)
@@ -66,10 +69,11 @@ namespace ClinicBookingApi.Repositories
 			};
 		}
 
-		public async Task<PaginatedResult<Appointment>> GetPaginatedByUserWithDetailsAsync(int userId, int pageNumber, int pageSize)
+		public async Task<PaginatedResult<Appointment>> GetPaginatedByUserWithDetailsAsync(int userId, int pageNumber, int pageSize, bool activeOnly)
 		{
 			var query = _context.Appointments
 				.Where(a => a.Patient.UserId == userId || a.Doctor.UserId == userId);
+			if (activeOnly) query = FilterActive(query);
 
 			int totalRecords = await query.CountAsync();
 			int skip = (pageNumber - 1) * pageSize;
@@ -89,6 +93,12 @@ namespace ClinicBookingApi.Repositories
 				PageNumber = pageNumber,
 				PageSize = pageSize
 			};
+		}
+
+		private static IQueryable<Appointment> FilterActive(IQueryable<Appointment> query)
+		{
+			return query.Where(a => a.Status == AppointmentStatus.Pending
+								 || a.Status == AppointmentStatus.Confirmed);
 		}
 	}
 }

@@ -77,9 +77,9 @@ namespace ClinicBookingApi.Services
 			return _mapper.Map<AppointmentReadOnlyDTO>(appointment);
 		}
 
-		public async Task<PaginatedResult<AppointmentReadOnlyDTO>> GetPaginatedAppointmentsAsync(int pageNumber, int pageSize)
+		public async Task<PaginatedResult<AppointmentReadOnlyDTO>> GetPaginatedAppointmentsAsync(int pageNumber, int pageSize, bool activeOnly)
 		{
-			var result = await _unitOfWork.AppointmentRepository.GetPaginatedWithDetailsAsync(pageNumber, pageSize);
+			var result = await _unitOfWork.AppointmentRepository.GetPaginatedWithDetailsAsync(pageNumber, pageSize, activeOnly);
 
 			var dtoResult = new PaginatedResult<AppointmentReadOnlyDTO>()
 			{
@@ -139,10 +139,10 @@ namespace ClinicBookingApi.Services
 			return _mapper.Map<AppointmentReadOnlyDTO>(appointment);
 		}
 
-		public async Task<PaginatedResult<AppointmentReadOnlyDTO>> GetMyAppointmentsAsync(int currentUserId, int pageNumber, int pageSize)
+		public async Task<PaginatedResult<AppointmentReadOnlyDTO>> GetMyAppointmentsAsync(int currentUserId, int pageNumber, int pageSize, bool activeOnly)
 		{
 			var result = await _unitOfWork.AppointmentRepository
-				.GetPaginatedByUserWithDetailsAsync(currentUserId, pageNumber, pageSize);
+				.GetPaginatedByUserWithDetailsAsync(currentUserId, pageNumber, pageSize, activeOnly);
 
 			var dtoResult = new PaginatedResult<AppointmentReadOnlyDTO>()
 			{
