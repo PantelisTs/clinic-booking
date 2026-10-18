@@ -1,49 +1,50 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button.tsx"
 import { useAuth } from "@/context/AuthProvider.tsx"
-import { cancelAppointment, getMyAppointments } from "@/api/appointments.ts"
+import { useAppointments } from "@/hooks/useAppointments.ts"
+import { cancelAppointment } from "@/api/appointments.ts"
 import { getDoctors } from "@/api/doctors.ts"
 import { UnauthorizedError } from "@/api/http.ts"
 import type { Appointment } from "@/schemas/appointment.ts"
 import type { Doctor } from "@/schemas/doctor.ts"
 import AppointmentCard from "@/components/appointments/AppointmentCard.tsx"
 import BookAppointmentForm from "@/components/appointments/BookAppointmentForm.tsx"
+import Pagination from "@/components/common/Pagination.tsx"
 
 export default function PatientDashboard() {
     const { token, logoutUser } = useAuth()
-    const [appointments, setAppointments] = useState<Appointment[]>([])
+    const {
+        appointments,
+        pageNumber,
+        setPageNumber,
+        totalPages,
+        activeOnly,
+        toggleActiveOnly,
+        reload,
+        loading,
+    } = useAppointments("my")
     const [doctors, setDoctors] = useState<Doctor[]>([])
-    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (!token) return
 
-        Promise.all([getMyAppointments(token), getDoctors(token)])
-            .then(([appointmentsRes, doctorsRes]) => {
-                setAppointments(appointmentsRes.data)
-                setDoctors(doctorsRes.data)
-            })
+        getDoctors(token)
+            .then((res) => setDoctors(res.data))
             .catch((error: unknown) => {
                 if (error instanceof UnauthorizedError) logoutUser()
-                toast.error(error instanceof Error ? error.message : "Request failed")
+                toast.error(error instanceof Error ? error.message : "Could not load doctors")
             })
-            .finally(() => setLoading(false))
     }, [token, logoutUser])
-
-    const handleBooked = (appointment: Appointment) => {
-        setAppointments((prev) =>
-            [...prev, appointment].sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
-        )
-    }
 
     const handleCancel = async (appointment: Appointment) => {
         if (!token) return
         if (!window.confirm("Cancel this appointment?")) return
 
         try {
-            const updated = await cancelAppointment(token, appointment.id)
-            setAppointments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+            await cancelAppointment(token, appointment.id)
             toast.success("Appointment cancelled")
+            reload()
         } catch (error) {
             if (error instanceof UnauthorizedError) logoutUser()
             toast.error(error instanceof Error ? error.message : "Cancel failed")
@@ -52,21 +53,38 @@ export default function PatientDashboard() {
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Your appointments</h2>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Your appointments</h2>
+                <Button variant="outline" size="sm" onClick={toggleActiveOnly}>
+                    {activeOnly ? "Show all" : "Show active only"}
+                </Button>
+            </div>
 
-            <BookAppointmentForm doctors={doctors} onBooked={handleBooked} />
+            <BookAppointmentForm doctors={doctors} onBooked={reload} />
 
             {loading && <p className="text-muted-foreground">Loading...</p>}
 
             {!loading && appointments.length === 0 && (
-                <p className="text-muted-foreground">You have no appointments yet.</p>
+                <p className="text-muted-foreground">
+                    {activeOnly ? "You have no active appointments." : "You have no appointments yet."}
+                </p>
             )}
 
             <div className="grid gap-4">
                 {appointments.map((appointment) => (
-                    <AppointmentCard key={appointment.id} appointment={appointment} onCancel={handleCancel} />
+                    <AppointmentCard
+                        key={appointment.id}
+                        appointment={appointment}
+                        onCancel={handleCancel}
+                    />
                 ))}
             </div>
+
+            <Pagination
+                pageNumber={pageNumber}
+                totalPages={totalPages}
+                onPageChange={setPageNumber}
+            />
         </div>
     )
 }
