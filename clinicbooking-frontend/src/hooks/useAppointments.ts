@@ -15,6 +15,7 @@ export function useAppointments(scope: "my" | "all") {
     const [totalRecords, setTotalRecords] = useState(0)
     const [activeOnly, setActiveOnly] = useState(true)
     const [loading, setLoading] = useState(true)
+    const [reloadKey, setReloadKey] = useState(0)
 
     useEffect(() => {
         if (!token) return
@@ -32,22 +33,24 @@ export function useAppointments(scope: "my" | "all") {
                 toast.error(error instanceof Error ? error.message : "Request failed")
             })
             .finally(() => setLoading(false))
-    }, [token, logoutUser, scope, pageNumber, activeOnly])
+    }, [token, logoutUser, scope, pageNumber, activeOnly, reloadKey])
 
     const toggleActiveOnly = () => {
         setActiveOnly((prev) => !prev)
         setPageNumber(1)
     }
 
+    const reload = () => setReloadKey((prev) => prev + 1)
+
     return {
         appointments,
-        setAppointments,
         pageNumber,
         setPageNumber,
         totalPages,
         totalRecords,
         activeOnly,
         toggleActiveOnly,
+        reload,
         loading,
     }
 }
