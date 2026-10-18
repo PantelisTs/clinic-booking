@@ -1,10 +1,10 @@
 import { request } from "@/api/http.ts"
 import type {Appointment, AppointmentStatus, BookAppointmentFields, PaginatedResult} from "@/schemas/appointment.ts"
 
-export function getMyAppointments(token: string, pageNumber = 1, pageSize = 10) {
+export function getMyAppointments(token: string, pageNumber = 1, pageSize = 10, activeOnly = false) {
     return request<PaginatedResult<Appointment>>(
         "GET",
-        `/appointments/my?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+        `/appointments/my?pageNumber=${pageNumber}&pageSize=${pageSize}&activeOnly=${activeOnly}`,
         { token }
     )
 }
@@ -31,10 +31,10 @@ export function updateAppointment(
     return request<Appointment>("PUT", `/appointments/${id}`, { token, body: changes })
 }
 
-export function getAllAppointments(token: string, pageNumber = 1, pageSize = 10) {
+export function getAllAppointments(token: string, pageNumber = 1, pageSize = 10, activeOnly = false) {
     return request<PaginatedResult<Appointment>>(
         "GET",
-        `/appointments?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+        `/appointments?pageNumber=${pageNumber}&pageSize=${pageSize}&activeOnly=${activeOnly}`,
         { token }
     )
 }
