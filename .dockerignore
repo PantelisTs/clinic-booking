@@ -23,3 +23,6 @@ Dockerfile
 
 # Test project
 ClinicBookingApi.Tests
+
+# Local secrets
+**/appsettings.Development.json
